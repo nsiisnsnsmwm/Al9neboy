@@ -7,6 +7,9 @@ from config import config
 from utils import yt_search, vc_handler
 from utils.fonts import apply_font
 from utils.vc_handler import get_vc
+from utils.vc_handler import vc_handler
+from utils.vc_handler import VoiceChat
+# Then use vc_handler.VoiceChat
 
 # Global variables for music control
 current_song = None
