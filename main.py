@@ -6,8 +6,10 @@ from config import config
 from handlers import (
     music, admin, spam, welcome, volume, reply_ai
 )
-from utils.vc_handler import vc_handler
+from utils.vc_handler import VoiceChat, vc_status
 from utils import yt_search
+from utils.vc_handler import VoiceChat, vc_status
+from utils.vc_handler import VoiceChat, vc_status
 
 app = Client(
     "vishal_music_bot",
