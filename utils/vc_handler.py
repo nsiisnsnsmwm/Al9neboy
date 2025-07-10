@@ -1,5 +1,5 @@
 import os
-import ffmpeg
+import asyncio
 import yt_dlp
 from pyrogram import Client
 from pyrogram.types import Message
@@ -48,6 +48,9 @@ class VoiceChat:
                 return False
                 
         try:
+            # Create downloads directory if not exists
+            os.makedirs("downloads", exist_ok=True)
+            
             # Download the audio stream with specified quality
             ydl_opts = {
                 'format': 'bestaudio/best',
@@ -61,7 +64,7 @@ class VoiceChat:
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
+                info = await asyncio.to_thread(ydl.extract_info, url, download=True)
                 filename = ydl.prepare_filename(info)
                 audio_file = os.path.splitext(filename)[0] + '.opus'
                 
@@ -73,7 +76,11 @@ class VoiceChat:
             )
             
             # Clean up
-            os.remove(audio_file)
+            if os.path.exists(audio_file):
+                os.remove(audio_file)
+            if os.path.exists(filename):
+                os.remove(filename)
+                
             self.is_playing = True
             self.is_paused = False
             return True
@@ -137,3 +144,12 @@ def get_vc(chat_id: int, bot: Client, user: Client):
     if chat_id not in vc_status:
         vc_status[chat_id] = VoiceChat(bot, user, chat_id)
     return vc_status[chat_id]
+
+# Export handler for easy importing
+vc_handler = {
+    'VoiceChat': VoiceChat,
+    'vc_status': vc_status,
+    'get_vc': get_vc
+}
+
+__all__ = ['VoiceChat', 'vc_status', 'get_vc', 'vc_handler']
