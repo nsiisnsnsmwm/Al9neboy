@@ -1,0 +1,5 @@
+pyrogram>=2.0.0
+yt-dlp>=2023.7.6
+ffmpeg-python>=0.2.0
+pymongo>=4.3.3
+python-dotenv>=1.0.0
