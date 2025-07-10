@@ -6,6 +6,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from config import config
 from utils import yt_search, vc_handler
 from utils.fonts import apply_font
+from utils.vc_handler import get_vc
 
 # Global variables for music control
 current_song = None

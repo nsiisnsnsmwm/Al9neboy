@@ -1,19 +1,20 @@
 from pyrogram import Client, filters
-from pyrogram.types import Message, CallbackQuery
+from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from config import config
-from utils.vc_handler import vc_handler
+from utils.vc_handler import get_vc  # Changed from vc_handler to get_vc
 
 def setup(client: Client, user: Client):
     @client.on_message(filters.command("volume") & filters.group)
     async def set_volume(_, message: Message):
         chat_id = message.chat.id
+        vc = get_vc(chat_id, client, user)  # Use get_vc instead of vc_handler
         
-        if chat_id not in vc_handler.vc_status or not vc_handler.vc_status[chat_id].is_connected:
+        if not vc.is_connected:
             await message.reply_text("Not connected to voice chat.")
             return
             
         if len(message.command) < 2:
-            current_vol = vc_handler.vc_status[chat_id].volume
+            current_vol = vc.volume
             await message.reply_text(f"Current volume: {current_vol}%")
             return
             
@@ -23,7 +24,7 @@ def setup(client: Client, user: Client):
                 await message.reply_text("Volume must be between 0 and 200.")
                 return
                 
-            await vc_handler.vc_status[chat_id].set_volume(volume)
+            await vc.set_volume(volume)
             await message.reply_text(f"Volume set to {volume}%")
         except ValueError:
             await message.reply_text("Please provide a valid number for volume.")
@@ -31,12 +32,12 @@ def setup(client: Client, user: Client):
     @client.on_callback_query(filters.regex(r"^vol_(up|down)$"))
     async def volume_callback(_, query: CallbackQuery):
         chat_id = query.message.chat.id
+        vc = get_vc(chat_id, client, user)  # Use get_vc instead of vc_handler
         
-        if chat_id not in vc_handler.vc_status or not vc_handler.vc_status[chat_id].is_connected:
+        if not vc.is_connected:
             await query.answer("Not connected to voice chat.")
             return
             
-        vc = vc_handler.vc_status[chat_id]
         direction = query.data.split("_")[1]
         
         if direction == "up":
